@@ -12,7 +12,12 @@
             <a href="/" class="site-logo-link">
                 <img src="{{ url_for('static', filename='wordmarkGreyBG-600x164.png') }}" alt="Laser Sports NZ Logo" class="site-logo">
             </a>
-            <nav class="main-nav">
+            <button class="burger-menu" id="burger-menu" aria-label="Open navigation" aria-expanded="false" aria-controls="main-nav">
+                <span class="burger-bar"></span>
+                <span class="burger-bar"></span>
+                <span class="burger-bar"></span>
+            </button>
+            <nav class="main-nav" id="main-nav">
                 <ul class="nav-menu">
                     <li class="nav-item"><a href="/">Home</a></li>
                     <li class="nav-item dropdown">
@@ -75,5 +80,16 @@
             </div>
         </div>
     </footer>
+    <script>
+    // Burger menu toggle for mobile nav
+    document.addEventListener('DOMContentLoaded', function() {
+        const burger = document.getElementById('burger-menu');
+        const nav = document.getElementById('main-nav');
+        burger.addEventListener('click', function() {
+            nav.classList.toggle('open');
+            burger.setAttribute('aria-expanded', nav.classList.contains('open'));
+        });
+    });
+    </script>
 </body>
 </html>
