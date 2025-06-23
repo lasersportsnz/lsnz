@@ -14,8 +14,27 @@ body {
     background: url('../static/Large-Background-Repeatable-01-scaled.jpg') repeat;
     background-size: cover;
     background-attachment: fixed;
+    background-position: center center;
+    background-repeat: repeat;
     display: flex;
     flex-direction: column;
+}
+
+@media (max-width: 900px) {
+    body {
+        background-attachment: scroll;
+        background-size: cover;
+        background-position: center top;
+    }
+}
+
+header.site-header {
+    background: #303030;
+    border-bottom: 5px solid #4F8098;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    z-index: 1001;
 }
 
 header.site-header,
@@ -264,8 +283,13 @@ footer.site-footer {
     }
     .burger-menu {
         display: flex;
+        position: absolute;
+        top: 12px;
+        right: 16px;
+        z-index: 1200;
     }
     .header-inner {
+        position: relative;
         flex-wrap: wrap;
     }
     .header-inner,
@@ -275,5 +299,9 @@ footer.site-footer {
         margin: 0;
         padding-left: 0;
         padding-right: 0;
+    }
+    .footer-inner {
+        padding-left: 16px;
+        padding-right: 16px;
     }
 }

@@ -91,7 +91,7 @@ def blog():
             'body': 'Here\'s why you should play laser tag: it\'s a great way to exercise and have fun!'
         }
     ]
-    return render_template('blog.html', title='Blog', user=user, posts=posts)
+    return render_template('blog.html', title='Blog', posts=posts)
 
 
 @bp.route('/about')
