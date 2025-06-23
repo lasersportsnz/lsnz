@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Laser Sports NZ{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-inner">
+            <a href="/" class="site-logo-link">
+                <img src="{{ url_for('static', filename='wordmarkGreyBG-600x164.png') }}" alt="Laser Sports NZ Logo" class="site-logo">
+            </a>
+            <nav class="main-nav">
+                <ul class="nav-menu">
+                    <li class="nav-item"><a href="/">Home</a></li>
+                    <li class="nav-item dropdown">
+                        <a href="{{ url_for('main.events') }}">Events</a>
+                        <ul class="dropdown-menu">
+                            <li class="nav-item"><a href="{{ url_for('main.leagues') }}">Leagues</a></li>
+                            <li class="nav-item"><a href="{{ url_for('main.formats') }}">Game Formats</a></li>
+                            <li class="nav-item"><a href="{{ url_for('main.guides') }}">Guides to Improving</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a href="{{ url_for('main.results') }}">Results</a>
+                        <ul class="dropdown-menu">
+                            <li class="nav-item"><a href="{{ url_for('main.invitationals') }}">Invitationals</a></li>
+                            <li class="nav-item"><a href="{{ url_for('main.zltac') }}">ZLTAC</a></li>
+                            <li class="nav-item"><a href="{{ url_for('main.worlds') }}">Worlds</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item"><a href="{{ url_for('main.gallery') }}">Gallery</a></li>
+                    <li class="nav-item dropdown">
+                        <a href="{{ url_for('main.resources') }}">Resources</a>
+                        <ul class="dropdown-menu">
+                            <li class="nav-item"><a href="#">Maze Maps</a></li>
+                            <li class="nav-item"><a href="#">Rules & Regulations</a></li>
+                            <li class="nav-item"><a href="#">Tools & How Tos</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item"><a href="{{ url_for('main.blog') }}">Blog</a></li>
+                    <li class="nav-item"><a href="{{ url_for('main.about') }}">About Us</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+    <main class="site-main">
+        {% block content %}{% endblock %}
+    </main>
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <div class="footer-links">
+                <a href="/terms">Terms of Service</a>
+                <a href="/privacy">Privacy Policy</a>
+                <a href="mailto:admin@lasersportsnz.com">Contact: admin@lasersportsnz.com</a>
+            </div>
+            <div class="footer-social">
+                <a href="https://www.facebook.com/LaserSportsNZ/" target="_blank" rel="noopener" aria-label="Facebook">
+                    <img src="{{ url_for('static', filename='icons/facebook_icon.svg') }}" alt="Facebook" class="footer-social-icon-img">
+                </a>
+                <a href="https://www.youtube.com/channel/UCVOFJ4_4ECdxqW1NDom71rA" target="_blank" rel="noopener" aria-label="YouTube">
+                    <img src="{{ url_for('static', filename='icons/youtube_icon.svg') }}" alt="YouTube" class="footer-social-icon-img">
+                </a>
+                <a href="https://www.twitch.tv/lasersportsnz" target="_blank" rel="noopener" aria-label="Twitch">
+                    <img src="{{ url_for('static', filename='icons/twitch_icon.svg') }}" alt="Twitch" class="footer-social-icon-img">
+                </a>
+                <a href="https://www.instagram.com/lasersportsnz/" target="_blank" rel="noopener" aria-label="Instagram">
+                    <img src="{{ url_for('static', filename='icons/instagram_icon.svg') }}" alt="Instagram" class="footer-social-icon-img">
+                </a>
+            </div>
+            <div class="footer-copyright">
+                &copy; {{ current_year if current_year is defined else 2025 }} Laser Sports New Zealand
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

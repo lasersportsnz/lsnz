@@ -1,0 +1,20 @@
+[project]
+name = "lsnz"
+version = "1.0.0"
+description = "New and improved LSNZ Website"
+requires-python = ">=3.12"
+dependencies = [
+    "flask",
+    "flask-sqlalchemy",
+    "flask-migrate",
+    "dotenv>=0.9.9",
+]
+
+[tool.pytest.ini_options]
+addopts = [
+    "--import-mode=importlib",
+]
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
