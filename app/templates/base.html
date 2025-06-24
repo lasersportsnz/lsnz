@@ -21,8 +21,9 @@
                 <ul class="nav-menu">
                     <li class="nav-item"><a href="/">Home</a></li>
                     <li class="nav-item dropdown">
-                        <a href="{{ url_for('main.events') }}">Events</a>
+                        <a href="{{ url_for('main.play') }}">Play</a>
                         <ul class="dropdown-menu">
+                            <li class="nav-item"><a href="{{ url_for('main.events') }}">Events</a></li>
                             <li class="nav-item"><a href="{{ url_for('main.leagues') }}">Leagues</a></li>
                             <li class="nav-item"><a href="{{ url_for('main.formats') }}">Game Formats</a></li>
                             <li class="nav-item"><a href="{{ url_for('main.guides') }}">Guides to Improving</a></li>
@@ -47,10 +48,26 @@
                     </li>
                     <li class="nav-item"><a href="{{ url_for('main.blog') }}">Blog</a></li>
                     <li class="nav-item"><a href="{{ url_for('main.about') }}">About Us</a></li>
+                    <li class="nav-item">
+                        {% if current_user.is_anonymous %}
+                        <a href="{{ url_for('auth.login') }}">Login</a>
+                        {% else %}
+                        <a href="{{ url_for('auth.logout') }}">Logout</a>
+                        {% endif %}
+                    </li>
                 </ul>
             </nav>
         </div>
     </header>
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <ul>
+        {% for message in messages %}
+        <li>{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
     <main class="site-main">
         {% block content %}{% endblock %}
     </main>

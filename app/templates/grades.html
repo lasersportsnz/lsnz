@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="text-content-box">
+    <table class="grades-table">
+        <thead>
+            <tr>
+                <th>Alias</th>
+                <th>Grade</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for player in players %}
+            <tr>
+                <td>{{ player.alias }}</td>
+                <td><b>{{ player.grade }}</b></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

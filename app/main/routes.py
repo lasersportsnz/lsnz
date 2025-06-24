@@ -1,23 +1,26 @@
 import os
-from flask import render_template, request, jsonify, Response
+import markdown
+from flask import render_template, redirect, url_for, request, current_app
+from flask_login import current_user, login_required
 import sqlalchemy as sa
+from sqlalchemy import func
 from app import db
 from app.models import Player
 from app.main import bp
 
 CONTENT_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'content')
 
-def load_content(filename):
+def load_content(filename) -> str:
     with open(os.path.join(CONTENT_DIR, filename), encoding='utf-8') as f:
-        return f.read()
+        return markdown.markdown(f.read())
 
 @bp.route('/')
-def serve_page(): 
+def home(): 
     return render_template('base.html', title='Home', request=request)
 
 @bp.route('/play')
 def play():
-    play_text = load_content('play.html')
+    play_text = load_content('play.md')
     return render_template('text_page.html', title='Play', text_content=play_text)
 
 @bp.route('/play/events')
@@ -36,7 +39,7 @@ def events():
 
 @bp.route('/play/leagues')
 def leagues():
-    leagues_text = load_content('leagues.html')
+    leagues_text = load_content('leagues.md')
     return render_template('text_page.html', title='Leagues', text_content=leagues_text)
 
 @bp.route('/play/formats')
@@ -83,11 +86,11 @@ def resources():
 def blog():
     posts = [
         {
-            'author': {'username': 'Louis'},
+            'author': {'name': 'Louis'},
             'body': 'Laser tag is fun!'
         },
         {
-            'author': {'username': 'Rachel'},
+            'author': {'name': 'Rachel'},
             'body': 'Here\'s why you should play laser tag: it\'s a great way to exercise and have fun!'
         }
     ]
@@ -96,17 +99,25 @@ def blog():
 
 @bp.route('/about')
 def about():
-    about_text = load_content('about.html')
+    about_text = load_content('about.md')
     return render_template('text_page.html', title='About Us', text_content=about_text)
 
 @bp.route('/terms')
 def terms():
-    terms_text = load_content('terms.html')
+    terms_text = load_content('terms.md')
     return render_template('text_page.html', title='Terms of Service', text_content=terms_text)
 
 @bp.route('/privacy')
 def privacy():
-    privacy_text = load_content('privacy.html')
+    privacy_text = load_content('privacy.md')
     return render_template('text_page.html', title='Privacy Policy', text_content=privacy_text)
 
+@bp.route('/grades')
+def grades():
+    players = db.session.scalars(sa.select(Player).order_by(Player.grade)).all()
+    return render_template('grades.html', title='Player Grades', players=[player.to_dict() for player in players])
 
+@bp.route('/player/<alias>')
+def player(alias):
+    player = db.first_or_404(sa.select(Player).where(func.lower(Player.alias) == alias.lower()))
+    return render_template('player.html', player=player)

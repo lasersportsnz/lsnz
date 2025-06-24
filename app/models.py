@@ -1,30 +1,46 @@
 from typing import Optional
 import sqlalchemy as sa
 import sqlalchemy.orm as so
-from app import db
+from flask import current_app
+from flask_login import UserMixin
+from werkzeug.security import generate_password_hash, check_password_hash
+from app import db, login
 
-class Player(db.Model):
+
+class Player(UserMixin, db.Model):
     __tablename__ = 'players'
     id: so.Mapped[int] = so.mapped_column(primary_key=True, autoincrement=True)
-    name: so.Mapped[str] = so.mapped_column(sa.String(64), nullable=False)
-    email: so.Mapped[str] = so.mapped_column(sa.String(120), unique=True)
+    first_name: so.Mapped[str] = so.mapped_column(sa.String(64))
+    last_name: so.Mapped[str] = so.mapped_column(sa.String(64))
+    email: so.Mapped[str] = so.mapped_column(sa.String(120), unique=True, index=True)
     alias: so.Mapped[Optional[str]] = so.mapped_column(sa.String(20), nullable=True)
     grade: so.Mapped[Optional[str]] = so.mapped_column(sa.String(10), nullable=True)
     profile_picture: so.Mapped[Optional[str]] = so.mapped_column(sa.String(200), nullable=True)
     password_hash: so.Mapped[str] = so.mapped_column(sa.String(256))
     
+    def set_password(self, password):
+        self.password_hash = generate_password_hash(password)
+
+    def check_password(self, password):
+        return check_password_hash(self.password_hash, password)
+
     def to_dict(self):
         """Return object data in easily serialisable format"""
         return {
             'id': self.id,
-            'name': self.name,
+            'first_name': self.first_name,
+            'last_name': self.last_name,
             'email': self.email,
             'alias': self.alias,
             'grade': self.grade
         }
 
     def __repr__(self):
-        return f'<Player {self.name}>'
+        return f'<Player {self.first_name} {self.last_name}>'
+
+    @login.user_loader
+    def load_user(id):
+        return db.session.get(Player, int(id))
     
 class Site(db.Model):
     __tablename__ = 'sites'

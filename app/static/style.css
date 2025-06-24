@@ -305,3 +305,24 @@ footer.site-footer {
         padding-right: 16px;
     }
 }
+
+.grades-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0 auto;
+    background: #23272b;
+}
+.grades-table th, .grades-table td {
+    border: 1px solid #444;
+    padding: 10px 16px;
+    text-align: left;
+    color: #fff;
+}
+.grades-table th {
+    background: #303030;
+    color: #72C2E8;
+    font-weight: bold;
+}
+.grades-table tr:nth-child(even) {
+    background: #282c30;
+}
