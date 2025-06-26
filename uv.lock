@@ -137,6 +137,16 @@ wheels = [
 ]
 
 [[package]]
+name = "flask-principal"
+version = "0.4.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "blinker" },
+    { name = "flask" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/14/c7/2531aca6ab7baa3774fde2dfc9c9dd6d5a42576a1013a93701bfdc402fdd/Flask-Principal-0.4.0.tar.gz", hash = "sha256:f5d6134b5caebfdbb86f32d56d18ee44b080876a27269560a96ea35f75c99453", size = 5452, upload-time = "2013-06-14T18:56:14.264Z" }
+
+[[package]]
 name = "flask-sqlalchemy"
 version = "3.1.1"
 source = { registry = "https://pypi.org/simple" }
@@ -237,6 +247,7 @@ dependencies = [
     { name = "flask" },
     { name = "flask-login" },
     { name = "flask-migrate" },
+    { name = "flask-principal" },
     { name = "flask-sqlalchemy" },
     { name = "flask-wtf" },
     { name = "markdown" },
@@ -250,6 +261,7 @@ requires-dist = [
     { name = "flask" },
     { name = "flask-login", specifier = ">=0.6.3" },
     { name = "flask-migrate" },
+    { name = "flask-principal", specifier = ">=0.4.0" },
     { name = "flask-sqlalchemy" },
     { name = "flask-wtf", specifier = ">=1.2.2" },
     { name = "markdown", specifier = ">=3.8.2" },

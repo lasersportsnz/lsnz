@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="text-content-box">
+    <h2>{{ site.name }}</h2>
+    <dl class="row">
+        <dt class="col-sm-3">Location</dt>
+        <dd class="col-sm-9">{{ site.location }}</dd>
+
+        <dt class="col-sm-3">Capacity</dt>
+        <dd class="col-sm-9">{{ site.capacity }}</dd>
+
+        <dt class="col-sm-3">Description</dt>
+        <dd class="col-sm-9">{{ site.description }}</dd>
+    </dl>
+    {# Add more site details here as needed #}
+</div>
+{% endblock %}

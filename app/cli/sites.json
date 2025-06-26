@@ -1,0 +1,14 @@
+[
+  {
+    "name": "Auckland Laser Arena",
+    "country": "New Zealand",
+    "address": "123 Queen St, Auckland",
+    "system": "Laserforce"
+  },
+  {
+    "name": "Wellington Tag Zone",
+    "country": "New Zealand",
+    "address": "456 Cuba St, Wellington",
+    "system": "Zone"
+  }
+]

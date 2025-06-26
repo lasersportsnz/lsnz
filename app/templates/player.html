@@ -2,8 +2,19 @@
 
 {% block content %}
 <div class="text-content-box">
-    <h1>Player: {{ player.alias }}</h1>
-    <p> {{player.first_name}} {{player.last_name}} </p>
-    <p> Grade: {{player.grade}}</p>
+    <div class="table-responsive">
+        <table class="table table-bordered table-dark align-middle mb-0" style="max-width:600px; background-color:#23272b;">
+            <tr valign="top">
+                <td style="width:140px"><img src="{{ player.profile_picture }}" class="img-fluid rounded" alt="Profile picture"></td>
+                <td>
+                    <h1 class="h4 mb-2">Player: {{ player.alias }}</h1>
+                    <p class="mb-1">{{ player.first_name }} {{ player.last_name }}</p>
+                    <p class="mb-1"><strong>Grade:</strong> {{ player.grade }}</p>
+                    <p class="mb-1"><strong>Playing since:</strong> {{ player.playing_since }}</p>
+                    {% if player.bio %}<p class="mb-0">{{ player.bio }}</p>{% endif %}
+                </td>
+            </tr>
+        </table>
+    </div>
 </div>
 {% endblock %}

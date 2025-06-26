@@ -1,11 +1,13 @@
 import os
+import datetime
 import markdown
 from flask import render_template, redirect, url_for, request, current_app
 from flask_login import current_user, login_required
+from app.auth.identity import admin_permission
 import sqlalchemy as sa
 from sqlalchemy import func
 from app import db
-from app.models import Player
+from app.models import Player, Grade, Event, Site
 from app.main import bp
 
 CONTENT_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'content')
@@ -22,20 +24,6 @@ def home():
 def play():
     play_text = load_content('play.md')
     return render_template('text_page.html', title='Play', text_content=play_text)
-
-@bp.route('/play/events')
-def events():
-    events = [
-        {
-            'site': {'country': 'Australia'},
-            'body': 'Oceanic Champs 2025'
-        },
-        {
-            'site': {'country': 'New Zealand'},
-            'body': 'ZLTAC 2026'
-        }
-    ]
-    return render_template('events.html', title='Events', events=events)
 
 @bp.route('/play/leagues')
 def leagues():
@@ -114,10 +102,23 @@ def privacy():
 
 @bp.route('/players')
 def players():
-    players = db.session.scalars(sa.select(Player).order_by(Player.grade)).all()
-    return render_template('players.html', title='Player List', players=[player.to_dict() for player in players])
+    grades = db.session.scalars(sa.select(Grade).order_by(Grade.points.desc())).all()
+    players = db.session.scalars(
+        sa.select(Player)
+        .join(Grade, Player.grade_id == Grade.id)
+        .order_by(Grade.points.desc())
+    ).all()
+    return render_template('players.html', title='Player List', 
+                           players=[player.to_dict() for player in players],
+                           grades = [grade.to_dict() for grade in grades])
 
 @bp.route('/players/<alias>')
 def player(alias):
     player = db.first_or_404(sa.select(Player).where(func.lower(Player.alias) == alias.lower()))
     return render_template('player.html', player=player)
+
+@bp.route('/admin')
+@login_required
+@admin_permission.require(http_exception=403)
+def admin():
+    return "Hello admin"
