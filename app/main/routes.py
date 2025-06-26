@@ -112,12 +112,12 @@ def privacy():
     privacy_text = load_content('privacy.md')
     return render_template('text_page.html', title='Privacy Policy', text_content=privacy_text)
 
-@bp.route('/grades')
-def grades():
+@bp.route('/players')
+def players():
     players = db.session.scalars(sa.select(Player).order_by(Player.grade)).all()
-    return render_template('grades.html', title='Player Grades', players=[player.to_dict() for player in players])
+    return render_template('players.html', title='Player List', players=[player.to_dict() for player in players])
 
-@bp.route('/player/<alias>')
+@bp.route('/players/<alias>')
 def player(alias):
     player = db.first_or_404(sa.select(Player).where(func.lower(Player.alias) == alias.lower()))
     return render_template('player.html', player=player)

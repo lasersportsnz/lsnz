@@ -3,93 +3,103 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{% block title %}Laser Sports NZ{% endblock %}</title>
+    <title>{% block title %}{% endblock %} - Laser Sports NZ</title>
+
+    {% block styles %}
+    {{ bootstrap.load_css() }}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    {% endblock %}
 </head>
-<body>
+<body class="d-flex flex-column min-vh-100">
     <header class="site-header">
-        <div class="header-inner">
-            <a href="/" class="site-logo-link">
-                <img src="{{ url_for('static', filename='wordmarkGreyBG-600x164.png') }}" alt="Laser Sports NZ Logo" class="site-logo">
-            </a>
-            <button class="burger-menu" id="burger-menu" aria-label="Open navigation" aria-expanded="false" aria-controls="main-nav">
-                <span class="burger-bar"></span>
-                <span class="burger-bar"></span>
-                <span class="burger-bar"></span>
-            </button>
-            <nav class="main-nav" id="main-nav">
-                <ul class="nav-menu">
-                    <li class="nav-item"><a href="/">Home</a></li>
-                    <li class="nav-item dropdown">
-                        <a href="{{ url_for('main.play') }}">Play</a>
-                        <ul class="dropdown-menu">
-                            <li class="nav-item"><a href="{{ url_for('main.events') }}">Events</a></li>
-                            <li class="nav-item"><a href="{{ url_for('main.leagues') }}">Leagues</a></li>
-                            <li class="nav-item"><a href="{{ url_for('main.formats') }}">Game Formats</a></li>
-                            <li class="nav-item"><a href="{{ url_for('main.guides') }}">Guides to Improving</a></li>
-                        </ul>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a href="{{ url_for('main.results') }}">Results</a>
-                        <ul class="dropdown-menu">
-                            <li class="nav-item"><a href="{{ url_for('main.invitationals') }}">Invitationals</a></li>
-                            <li class="nav-item"><a href="{{ url_for('main.zltac') }}">ZLTAC</a></li>
-                            <li class="nav-item"><a href="{{ url_for('main.worlds') }}">Worlds</a></li>
-                        </ul>
-                    </li>
-                    <li class="nav-item"><a href="{{ url_for('main.gallery') }}">Gallery</a></li>
-                    <li class="nav-item dropdown">
-                        <a href="{{ url_for('main.resources') }}">Resources</a>
-                        <ul class="dropdown-menu">
-                            <li class="nav-item"><a href="#">Maze Maps</a></li>
-                            <li class="nav-item"><a href="#">Rules & Regulations</a></li>
-                            <li class="nav-item"><a href="#">Tools & How Tos</a></li>
-                        </ul>
-                    </li>
-                    <li class="nav-item"><a href="{{ url_for('main.blog') }}">Blog</a></li>
-                    <li class="nav-item"><a href="{{ url_for('main.about') }}">About Us</a></li>
-                    <li class="nav-item">
-                        {% if current_user.is_anonymous %}
-                        <a href="{{ url_for('auth.login') }}">Login</a>
-                        {% else %}
-                        <a href="{{ url_for('auth.logout') }}">Logout</a>
-                        {% endif %}
-                    </li>
-                </ul>
-            </nav>
-        </div>
+        <nav class="navbar navbar-expand-lg navbar-dark" style="background-color:#303030;">
+            <div class="container-fluid">
+                <a class="navbar-brand d-flex align-items-center" href="/">
+                    <img src="{{ url_for('static', filename='wordmarkGreyBG-600x164.png') }}" alt="Laser Sports NZ Logo" class="site-logo me-2" height="40">
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNavDropdown">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="{{ url_for('main.play') }}" id="playDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Play</a>
+                            <ul class="dropdown-menu" aria-labelledby="playDropdown">
+                                <li><a class="dropdown-item" href="{{ url_for('main.events') }}">Events</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('main.leagues') }}">Leagues</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('main.formats') }}">Game Formats</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('main.guides') }}">Guides to Improving</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="{{ url_for('main.results') }}" id="resultsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Results</a>
+                            <ul class="dropdown-menu" aria-labelledby="resultsDropdown">
+                                <li><a class="dropdown-item" href="{{ url_for('main.invitationals') }}">Invitationals</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('main.zltac') }}">ZLTAC</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('main.worlds') }}">Worlds</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('main.players') }}">Players</a></li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="{{ url_for('main.resources') }}" id="resourcesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Resources</a>
+                            <ul class="dropdown-menu" aria-labelledby="resourcesDropdown">
+                                <li><a class="dropdown-item" href="#">Maze Maps</a></li>
+                                <li><a class="dropdown-item" href="#">Rules & Regulations</a></li>
+                                <li><a class="dropdown-item" href="#">Tools & How Tos</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('main.blog') }}">Blog</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('main.about') }}">About Us</a></li>
+                    </ul>
+                    <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            {% if current_user.is_anonymous %}
+                            <a class="btn btn-info ms-lg-3" href="{{ url_for('auth.login') }}">Login</a>
+                            {% else %}
+                            <a class="btn btn-info ms-lg-3" href="{{ url_for('auth.logout') }}">Logout</a>
+                            {% endif %}
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
     </header>
     {% with messages = get_flashed_messages() %}
     {% if messages %}
-    <ul>
-        {% for message in messages %}
-        <li>{{ message }}</li>
-        {% endfor %}
-    </ul>
+    <div class="container mt-3">
+        <div class="alert alert-info">
+            <ul class="mb-0">
+                {% for message in messages %}
+                <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
     {% endif %}
     {% endwith %}
-    <main class="site-main">
+    <main class="site-main container flex-grow-1">
         {% block content %}{% endblock %}
     </main>
-    <footer class="site-footer">
-        <div class="footer-inner">
-            <div class="footer-links">
-                <a href="/terms">Terms of Service</a>
-                <a href="/privacy">Privacy Policy</a>
-                <a href="mailto:admin@lasersportsnz.com">Contact: admin@lasersportsnz.com</a>
+    <footer class="site-footer text-light mt-5 py-4" style="background-color: #303030;">
+        <div class="container footer-inner d-flex flex-wrap justify-content-between align-items-center">
+            <div class="footer-links mb-2 mb-lg-0">
+                <a class="text-info me-3" href="/terms">Terms of Service</a>
+                <a class="text-info me-3" href="/privacy">Privacy Policy</a>
+                <a class="text-info" href="mailto:admin@lasersportsnz.com">Contact: admin@lasersportsnz.com</a>
             </div>
-            <div class="footer-social">
-                <a href="https://www.facebook.com/LaserSportsNZ/" target="_blank" rel="noopener" aria-label="Facebook">
-                    <img src="{{ url_for('static', filename='icons/facebook_icon.svg') }}" alt="Facebook" class="footer-social-icon-img">
+            <div class="footer-social mb-2 mb-lg-0">
+                <a href="https://www.facebook.com/LaserSportsNZ/" target="_blank" rel="noopener" aria-label="Facebook" class="text-info fs-3 me-3">
+                    <i class="bi bi-facebook"></i>
                 </a>
-                <a href="https://www.youtube.com/channel/UCVOFJ4_4ECdxqW1NDom71rA" target="_blank" rel="noopener" aria-label="YouTube">
-                    <img src="{{ url_for('static', filename='icons/youtube_icon.svg') }}" alt="YouTube" class="footer-social-icon-img">
+                <a href="https://www.youtube.com/channel/UCVOFJ4_4ECdxqW1NDom71rA" target="_blank" rel="noopener" aria-label="YouTube" class="text-info fs-3 me-3">
+                    <i class="bi bi-youtube"></i>
                 </a>
-                <a href="https://www.twitch.tv/lasersportsnz" target="_blank" rel="noopener" aria-label="Twitch">
-                    <img src="{{ url_for('static', filename='icons/twitch_icon.svg') }}" alt="Twitch" class="footer-social-icon-img">
+                <a href="https://www.twitch.tv/lasersportsnz" target="_blank" rel="noopener" aria-label="Twitch" class="text-info fs-3 me-3">
+                    <i class="bi bi-twitch"></i>
                 </a>
-                <a href="https://www.instagram.com/lasersportsnz/" target="_blank" rel="noopener" aria-label="Instagram">
-                    <img src="{{ url_for('static', filename='icons/instagram_icon.svg') }}" alt="Instagram" class="footer-social-icon-img">
+                <a href="https://www.instagram.com/lasersportsnz/" target="_blank" rel="noopener" aria-label="Instagram" class="text-info fs-3">
+                    <i class="bi bi-instagram"></i>
                 </a>
             </div>
             <div class="footer-copyright">
@@ -97,16 +107,9 @@
             </div>
         </div>
     </footer>
-    <script>
-    // Burger menu toggle for mobile nav
-    document.addEventListener('DOMContentLoaded', function() {
-        const burger = document.getElementById('burger-menu');
-        const nav = document.getElementById('main-nav');
-        burger.addEventListener('click', function() {
-            nav.classList.toggle('open');
-            burger.setAttribute('aria-expanded', nav.classList.contains('open'));
-        });
-    });
-    </script>
+    {% block scripts %}
+        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
+        {{ bootstrap.load_js() }}
+    {% endblock %}
 </body>
 </html>
