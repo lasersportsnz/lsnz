@@ -38,8 +38,8 @@ body {
 }
 
 .text-content-box {
-    max-width: 800px;
-    margin: 0 auto;
+    margin: 2.5rem auto 0 auto;
+    /* Adds a gap above the content box on every page */
     padding: 32px 24px;
     background: #23272b;
     border-radius: 12px;
@@ -98,25 +98,47 @@ body {
   font-weight: bold;
 }
 
+/* Grades Table Styling - improved for visibility and width */
 .grades-table {
-    width: 100%;
+    width: 98%;
     border-collapse: collapse;
     margin: 0 auto;
-    background: #23272b;
+    background: #f8f9fa;
+    color: #23272b;
+    table-layout: fixed;
 }
 .grades-table th, .grades-table td {
     border: 1px solid #444;
     padding: 10px 16px;
     text-align: left;
-    color: #fff;
+    color: #23272b;
+    background: #f8f9fa;
+    overflow-wrap: break-word;
 }
 .grades-table th {
-    background: #303030;
-    color: #72C2E8;
+    background: #e3e6ea;
+    color: #007bff;
     font-weight: bold;
 }
+.grades-table td[data-field="description"] {
+    width: 40%;
+    min-width: 300px;
+    max-width: 500px;
+}
+.grades-table td[data-field="letter"] {
+    width: 10%;
+    min-width: 60px;
+}
+.grades-table td[data-field="points"] {
+    width: 10%;
+    min-width: 60px;
+}
+.grades-table td:last-child {
+    width: 20%;
+    min-width: 120px;
+}
 .grades-table tr:nth-child(even) {
-    background: #282c30;
+    background: #e9ecef;
 }
 @media (max-width: 900px) {
     .site-logo {

@@ -34,6 +34,9 @@ def create_app(config_class=Config):
     from app.events import bp as events_bp
     app.register_blueprint(events_bp)
     
+    from app.admin import bp as admin_bp
+    app.register_blueprint(admin_bp, url_prefix='/admin')
+    
     from app.auth import bp as auth_bp
     app.register_blueprint(auth_bp, url_prefix='/auth')
     

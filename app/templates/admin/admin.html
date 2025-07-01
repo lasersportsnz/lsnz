@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="text-content-box">
+    <h1>Admin Page</h1>
+    <p>Welcome to the admin page. Here you can manage various aspects of the application.</p>
+    <ul>
+        <li><a href="{{ url_for('admin.grades') }}">Manage Grades</a></li>
+    </ul>
+</div>
+{% endblock %}
