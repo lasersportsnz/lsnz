@@ -9,7 +9,7 @@
                 <td>
                     <h1 class="h4 mb-2">Player: {{ player.alias }}</h1>
                     <p class="mb-1">{{ player.first_name }} {{ player.last_name }}</p>
-                    <p class="mb-1"><strong>Grade:</strong> {{ player.grade }}</p>
+                    <p class="mb-1"><strong>Grade:</strong> {{ player.grade.letter }}</p>
                     <p class="mb-1"><strong>Playing since:</strong> {{ player.playing_since }}</p>
                     {% if player.bio %}<p class="mb-0">{{ player.bio }}</p>{% endif %}
                 </td>

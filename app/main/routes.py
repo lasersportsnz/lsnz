@@ -109,16 +109,10 @@ def players():
         .order_by(Grade.points.desc())
     ).all()
     return render_template('players.html', title='Player List', 
-                           players=[player.to_dict() for player in players],
-                           grades = [grade.to_dict() for grade in grades])
+                           players=players,
+                           grades=grades)
 
 @bp.route('/players/<alias>')
 def player(alias):
     player = db.first_or_404(sa.select(Player).where(func.lower(Player.alias) == alias.lower()))
     return render_template('player.html', player=player)
-
-@bp.route('/admin')
-@login_required
-@admin_permission.require(http_exception=403)
-def admin():
-    return "Hello admin"
