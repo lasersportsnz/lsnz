@@ -1,0 +1,38 @@
+[
+  {
+    "first_name": "Louis",
+    "last_name": "Habberfield-Short",
+    "email": "admin@example.com",
+    "alias": "Tradey",
+    "grade": "B",
+    "password": "adminpass",
+    "roles": "admin",
+    "bio": "Great at getting denied.",
+    "profile_picture": "https://randomuser.me/api/portraits/men/1.jpg",
+    "playing_since": "2015-01-01"
+  },
+  {
+    "first_name": "James",
+    "last_name": "Bond",
+    "email": "james@example.com",
+    "alias": "007",
+    "grade": "A",
+    "password": "testpass",
+    "roles": "player",
+    "bio": "Has a license to kill. With lasers.",
+    "profile_picture": "https://randomuser.me/api/portraits/men/2.jpg",
+    "playing_since": "2018-06-15"
+  },
+  {
+    "first_name": "Ash",
+    "last_name": "Ketchum",
+    "email": "ash@example.com",
+    "alias": "Pokemon Master",
+    "grade": "B",
+    "password": "testpass",
+    "roles": "player",
+    "bio": "Wants to be the very best, like no one ever was.",
+    "profile_picture": "https://randomuser.me/api/portraits/men/3.jpg",
+    "playing_since": "2022-03-10"
+  }
+]

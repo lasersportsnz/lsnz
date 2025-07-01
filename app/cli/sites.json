@@ -1,14 +1,14 @@
 [
   {
-    "name": "Auckland Laser Arena",
+    "name": "Megazone Silverdale",
     "country": "New Zealand",
-    "address": "123 Queen St, Auckland",
-    "system": "Laserforce"
+    "address": "Silverdale, Auckland",
+    "system": "Helios Pro"
   },
   {
-    "name": "Wellington Tag Zone",
+    "name": "Megazone Dunedin",
     "country": "New Zealand",
-    "address": "456 Cuba St, Wellington",
-    "system": "Zone"
+    "address": "Somewhere, Dunedin",
+    "system": "Helios 2"
   }
 ]

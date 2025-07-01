@@ -17,7 +17,7 @@ class Player(UserMixin, db.Model):
     email: so.Mapped[str] = so.mapped_column(sa.String(120), unique=True, index=True)
     alias: so.Mapped[Optional[str]] = so.mapped_column(sa.String(20))
     grade_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey('grades.id'), index=True, nullable=False)
-    grade: so.Mapped['Grade'] = so.relationship('Grade', back_populates='players')
+    grade: so.Mapped[Optional['Grade']] = so.relationship('Grade', back_populates='players')
     profile_picture: so.Mapped[Optional[str]] = so.mapped_column(sa.String(200))
     playing_since: so.Mapped[Optional[sa.Date]] = so.mapped_column(sa.Date)
     bio: so.Mapped[Optional[str]] = so.mapped_column(sa.String(140))
@@ -29,9 +29,7 @@ class Player(UserMixin, db.Model):
     def __init__(self, *args, grade=None, playing_since=None, **kwargs):
         super().__init__(*args, **kwargs)
         if grade is None:
-            # Default to the grade with the lowest points
-            lowest_grade = db.session.query(Grade).order_by(Grade.points.asc()).first()
-            self.grade = lowest_grade if lowest_grade else None
+            self.set_starting_grade()
         else:
             self.grade = grade
         if playing_since is None:
@@ -39,11 +37,36 @@ class Player(UserMixin, db.Model):
         else:
             self.playing_since = playing_since
 
+    def set_starting_grade(self):
+        # Start at grade with the lowest points
+        lowest_grade = db.session.query(Grade).order_by(Grade.points.asc()).first()
+        self.grade = lowest_grade if lowest_grade else None
+        
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
+
+    def from_dict(self, data, new_user=False):
+        for field in ['first_name', 
+                      'last_name', 
+                      'email', 
+                      'alias', 
+                      'profile_picture', 
+                      'bio', 
+                      'roles']:
+            if field in data:
+                setattr(self, field, data[field])
+        if new_user:
+            if 'password' in data:
+                self.set_password(data['password'])
+            if 'grade_id' in data:
+                self.grade = db.session.get(Grade, data['grade_id'])
+            elif 'grade' in data:
+                self.grade = db.session.query(Grade).filter_by(letter=data['grade']).first()
+            else:
+                self.set_starting_grade()
 
     def to_dict(self):
         """Return object data in easily serialisable format"""
@@ -53,7 +76,7 @@ class Player(UserMixin, db.Model):
             'last_name': self.last_name,
             'email': self.email,
             'alias': self.alias,
-            'grade': self.grade,
+            'grade': self.grade.letter if self.grade else None,
             'profile_picture': self.profile_picture,
             'playing_since': self.playing_since.isoformat() if self.playing_since else None,
             'bio': self.bio,
@@ -75,6 +98,11 @@ class Grade(db.Model):
     description: so.Mapped[Optional[str]] = so.mapped_column(sa.String(200))
     players = so.relationship('Player', back_populates='grade')
 
+    def from_dict(self, data):
+        for field in ['letter', 'points', 'description']:
+            if field in data:
+                setattr(self, field, data[field])
+
     def to_dict(self):
         """Return object data in easily serialisable format"""
         return {
@@ -88,6 +116,18 @@ class Grade(db.Model):
         return f'<Grade {self.letter} worth {self.points} points>'
     
 class Site(db.Model):
+    __tablename__ = 'sites'
+    id: so.Mapped[int] = so.mapped_column(primary_key=True, autoincrement=True)
+    name: so.Mapped[str] = so.mapped_column(sa.String(50))
+    country: so.Mapped[str] = so.mapped_column(sa.String(100))
+    address: so.Mapped[str] = so.mapped_column(sa.String(200))
+    system: so.Mapped[str] = so.mapped_column(sa.String(50))
+
+    def from_dict(self, data):
+        for field in ['name', 'country', 'address', 'system']:
+            if field in data:
+                setattr(self, field, data[field])
+
     def to_dict(self):
         return {
             'id': self.id,
@@ -96,18 +136,11 @@ class Site(db.Model):
             'address': self.address,
             'system': self.system
         }
-    __tablename__ = 'sites'
-    id: so.Mapped[int] = so.mapped_column(primary_key=True, autoincrement=True)
-    name: so.Mapped[str] = so.mapped_column(sa.String(50))
-    country: so.Mapped[str] = so.mapped_column(sa.String(100))
-    address: so.Mapped[str] = so.mapped_column(sa.String(200))
-    system: so.Mapped[str] = so.mapped_column(sa.String(50))
 
     def __repr__(self):
         return f'<Site {self.name} in {self.country}>'
 
 class Event(db.Model):
-    registrations = so.relationship('Registration', backref='event', cascade='all, delete-orphan')
     __tablename__ = 'events'
     id: so.Mapped[int] = so.mapped_column(primary_key=True, autoincrement=True)
     name: so.Mapped[str] = so.mapped_column(sa.String(50))
@@ -115,6 +148,12 @@ class Event(db.Model):
     date: so.Mapped[Optional[sa.Date]] = so.mapped_column(sa.Date)
     points_cap: so.Mapped[Optional[int]] = so.mapped_column(sa.Integer)
     format: so.Mapped[str] = so.mapped_column(sa.String(50))
+    registrations = so.relationship('Registration', backref='event', cascade='all, delete-orphan')
+
+    def from_dict(self, data):
+        for field in ['name', 'site_id', 'date', 'points_cap', 'format']:
+            if field in data:
+                setattr(self, field, data[field])
 
     def to_dict(self):
         return {
@@ -138,6 +177,11 @@ class Registration(db.Model):
     team_id: so.Mapped[Optional[int]] = so.mapped_column(sa.ForeignKey('teams.id'), index=True)
     paid: so.Mapped[bool] = so.mapped_column(sa.Boolean, default=False)
 
+    def from_dict(self, data):
+        for field in ['event_id', 'player_id', 'team_id', 'paid']:
+            if field in data:
+                setattr(self, field, data[field])
+
     def to_dict(self):
         return {
             'id': self.id,
@@ -156,6 +200,18 @@ class Team(db.Model):
     name: so.Mapped[str] = so.mapped_column(sa.String(50))
     event_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey('events.id'), index=True)
 
+    def from_dict(self, data):
+        for field in ['name', 'event_id']:
+            if field in data:
+                setattr(self, field, data[field])
+                
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'event_id': self.event_id
+        }
+
     def __repr__(self):
         return f'<Team {self.name} for Event {self.event_id}>'
     
@@ -165,6 +221,19 @@ class Post(db.Model):
     title: so.Mapped[str] = so.mapped_column(sa.String(50))
     author_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey('players.id'), nullable=False)
     author: so.Mapped['Player'] = so.relationship('Player', back_populates='posts')
+
+    def from_dict(self, data):
+        for field in ['title', 'author_id']:
+            if field in data:
+                setattr(self, field, data[field])
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'title': self.title,
+            'author_id': self.author_id,
+            'author': self.author.to_dict() if self.author else None
+        }
 
     def __repr__(self):
         return f'<Post {self.title} by {self.author}>'

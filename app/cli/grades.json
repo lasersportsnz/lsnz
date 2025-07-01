@@ -1,0 +1,37 @@
+[
+  {
+    "letter": "A",
+    "points": 7,
+    "description": "Players at the highest level in NZ."
+  },
+  {
+    "letter": "BB",
+    "points": 6,
+    "description": "Experienced players approaching the top level in NZ.​"
+  },
+  {
+    "letter": "B",
+    "points": 5,
+    "description": "Experienced players with well rounded skills.​"
+  },
+  {
+    "letter": "C",
+    "points": 4,
+    "description": "Players with pack skills and basic tactics.​"
+  },
+  {
+    "letter": "D",
+    "points": 3,
+    "description": "Players with some basic pack skills.​"
+  },
+  {
+    "letter": "E+",
+    "points": 1,
+    "description": "Players developing pack skills"
+  },
+  {
+    "letter": "E",
+    "points": 0,
+    "description": "New players"
+  }
+]
