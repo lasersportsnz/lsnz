@@ -1,6 +1,6 @@
 # LSNZ Website 2.0
 
-This is a reimplementation of the [LSNZ website](lasersportsnz.com) using Python and Flask, instead of Wordpress, to support adding more complex dynamic features and domain-specific data models.
+This is a reimplementation of the [LSNZ website](https://lasersportsnz.com) using Python and Flask, instead of Wordpress, to support adding more complex dynamic features and domain-specific data models.
 
 ## How to run
 This project uses [uv](https://docs.astral.sh/uv/) for dependency management. It's recommended you install this first, so that you can install all the project dependencies into a virtual environment with ```uv sync```. Then:
