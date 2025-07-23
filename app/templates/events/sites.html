@@ -8,8 +8,9 @@
             <thead>
                 <tr>
                     <th>Name</th>
-                    <th>Location</th>
-                    <th>Capacity</th>
+                    <th>Country</th>
+                    <th>Address</th>
+                    <th>System</th>
                 </tr>
             </thead>
             <tbody>
@@ -17,10 +18,11 @@
                 <tr>
                     <td>
                         {% set site_slug = site.name.lower().replace(' ', '-') %}
-                        <a href="{{ url_for('main.site_detail', site_slug=site_slug) }}">{{ site.name }}</a>
+                        <a href="{{ url_for('events.site_detail', site_slug=site_slug) }}">{{ site.name }}</a>
                     </td>
-                    <td>{{ site.location }}</td>
-                    <td>{{ site.capacity }}</td>
+                    <td>{{ site.country }}</td>
+                    <td>{{ site.address }}</td>
+                    <td>{{ site.system }}</td>
                 </tr>
                 {% endfor %}
             </tbody>

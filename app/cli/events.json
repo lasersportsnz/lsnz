@@ -1,16 +1,16 @@
 [
   {
-    "name": "NZ Nationals 2025",
-    "site_name": "Auckland Laser Arena",
-    "date": "2025-11-15",
+    "name": "NZ Nationals 2026",
+    "site_name": "Megazone Silverdale",
+    "date": "2026-11-15",
     "points_cap": 35,
-    "format": "5v5"
+    "format": "Teams"
   },
   {
-    "name": "Wellington Invitational 2024",
-    "site_name": "Wellington Tag Zone",
+    "name": "Dunedin Invitationals 2024",
+    "site_name": "Megazone Dunedin",
     "date": "2024-08-10",
     "points_cap": 30,
-    "format": "4v4"
+    "format": "Teams"
   }
 ]

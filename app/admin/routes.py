@@ -18,7 +18,7 @@ def admin():
 def grades():
     grades = db.session.scalars(sa.select(Grade).order_by(Grade.points.desc())).all()
     return render_template('admin/grades.html', title='Admin Grades', 
-                           grades=[grade.to_dict() for grade in grades])
+                           grades=grades)
 
 
 # --- AJAX API for grade CRUD ---

@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, List
 from datetime import date
 from collections import namedtuple
 from functools import partial
@@ -16,15 +16,15 @@ class Player(UserMixin, db.Model):
     last_name: so.Mapped[str] = so.mapped_column(sa.String(64))
     email: so.Mapped[str] = so.mapped_column(sa.String(120), unique=True, index=True)
     alias: so.Mapped[Optional[str]] = so.mapped_column(sa.String(20))
-    grade_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey('grades.id'), index=True, nullable=False)
-    grade: so.Mapped[Optional['Grade']] = so.relationship('Grade', back_populates='players')
+    grade_id: so.Mapped[Optional[int]] = so.mapped_column(sa.ForeignKey('grades.id'), index=True)
+    grade: so.Mapped[Optional['Grade']] = so.relationship(back_populates='players')
     profile_picture: so.Mapped[Optional[str]] = so.mapped_column(sa.String(200))
     playing_since: so.Mapped[Optional[sa.Date]] = so.mapped_column(sa.Date)
     bio: so.Mapped[Optional[str]] = so.mapped_column(sa.String(140))
     password_hash: so.Mapped[str] = so.mapped_column(sa.String(256))
     roles: so.Mapped[str] = so.mapped_column(sa.String(128))  # Comma-separated roles
-    posts = so.relationship('Post', back_populates='author')
-    registrations = so.relationship('Registration', back_populates='player')
+    posts: so.WriteOnlyMapped[List['Post']] = so.relationship(back_populates='author')
+    registrations: so.WriteOnlyMapped[List['Registration']] = so.relationship(back_populates='player')
 
     def __init__(self, *args, grade=None, playing_since=None, **kwargs):
         super().__init__(*args, **kwargs)
@@ -96,7 +96,7 @@ class Grade(db.Model):
     letter: so.Mapped[str] = so.mapped_column(sa.String(10), unique=True, index=True)
     points: so.Mapped[int] = so.mapped_column(sa.Integer, unique=True)
     description: so.Mapped[Optional[str]] = so.mapped_column(sa.String(200))
-    players = so.relationship('Player', back_populates='grade')
+    players: so.WriteOnlyMapped[List['Player']] = so.relationship(back_populates='grade')
 
     def from_dict(self, data):
         for field in ['letter', 'points', 'description']:
@@ -122,6 +122,7 @@ class Site(db.Model):
     country: so.Mapped[str] = so.mapped_column(sa.String(100))
     address: so.Mapped[str] = so.mapped_column(sa.String(200))
     system: so.Mapped[str] = so.mapped_column(sa.String(50))
+    events: so.WriteOnlyMapped[List['Event']] = so.relationship(back_populates='site')
 
     def from_dict(self, data):
         for field in ['name', 'country', 'address', 'system']:
@@ -144,11 +145,12 @@ class Event(db.Model):
     __tablename__ = 'events'
     id: so.Mapped[int] = so.mapped_column(primary_key=True, autoincrement=True)
     name: so.Mapped[str] = so.mapped_column(sa.String(50))
-    site_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey('sites.id'), index=True)
+    site_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey(Site.id), index=True)
+    site: so.Mapped['Site'] = so.relationship(back_populates='events')
     date: so.Mapped[Optional[sa.Date]] = so.mapped_column(sa.Date)
     points_cap: so.Mapped[Optional[int]] = so.mapped_column(sa.Integer)
     format: so.Mapped[str] = so.mapped_column(sa.String(50))
-    registrations = so.relationship('Registration', backref='event', cascade='all, delete-orphan')
+    registrations: so.WriteOnlyMapped[List['Registration']] = so.relationship(back_populates='event', cascade='all, delete-orphan')
 
     def from_dict(self, data):
         for field in ['name', 'site_id', 'date', 'points_cap', 'format']:
@@ -168,13 +170,35 @@ class Event(db.Model):
     def __repr__(self):
         return f'<Event {self.name} at {self.site_id}>'
 
+class Team(db.Model):
+    __tablename__ = 'teams'
+    id: so.Mapped[int] = so.mapped_column(primary_key=True, autoincrement=True)
+    name: so.Mapped[str] = so.mapped_column(sa.String(50))
+    event_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey(Event.id), index=True)
+
+    def from_dict(self, data):
+        for field in ['name', 'event_id']:
+            if field in data:
+                setattr(self, field, data[field])
+                
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'event_id': self.event_id
+        }
+
+    def __repr__(self):
+        return f'<Team {self.name} for Event {self.event_id}>'
+
 class Registration(db.Model):
     __tablename__ = 'registrations'
     id: so.Mapped[int] = so.mapped_column(primary_key=True, autoincrement=True)
-    event_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey('events.id'), index=True)
-    player_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey('players.id'), index=True)
-    player: so.Mapped['Player'] = so.relationship('Player', back_populates='registrations')
-    team_id: so.Mapped[Optional[int]] = so.mapped_column(sa.ForeignKey('teams.id'), index=True)
+    event_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey(Event.id), index=True)
+    event: so.Mapped['Event'] = so.relationship(back_populates='registrations')
+    player_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey(Player.id), index=True)
+    player: so.Mapped['Player'] = so.relationship(back_populates='registrations')
+    team_id: so.Mapped[Optional[int]] = so.mapped_column(sa.ForeignKey(Team.id), index=True)
     paid: so.Mapped[bool] = so.mapped_column(sa.Boolean, default=False)
 
     def from_dict(self, data):
@@ -194,33 +218,14 @@ class Registration(db.Model):
     def __repr__(self):
         return f'<Registration for Event {self.event_id} by Player {self.player_id}>'
     
-class Team(db.Model):
-    __tablename__ = 'teams'
-    id: so.Mapped[int] = so.mapped_column(primary_key=True, autoincrement=True)
-    name: so.Mapped[str] = so.mapped_column(sa.String(50))
-    event_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey('events.id'), index=True)
 
-    def from_dict(self, data):
-        for field in ['name', 'event_id']:
-            if field in data:
-                setattr(self, field, data[field])
-                
-    def to_dict(self):
-        return {
-            'id': self.id,
-            'name': self.name,
-            'event_id': self.event_id
-        }
-
-    def __repr__(self):
-        return f'<Team {self.name} for Event {self.event_id}>'
     
 class Post(db.Model):
     __tablename__ = 'posts'
     id: so.Mapped[int] = so.mapped_column(primary_key=True, autoincrement=True)
     title: so.Mapped[str] = so.mapped_column(sa.String(50))
-    author_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey('players.id'), nullable=False)
-    author: so.Mapped['Player'] = so.relationship('Player', back_populates='posts')
+    author_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey(Player.id), index=True)
+    author: so.Mapped['Player'] = so.relationship(back_populates='posts')
 
     def from_dict(self, data):
         for field in ['title', 'author_id']:

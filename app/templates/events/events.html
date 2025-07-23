@@ -24,9 +24,9 @@
                     </td>
                     <td>{{ event.date }}</td>
                     <td>
-                        {% if event.site_name %}
-                            {% set site_slug = event.site_name.lower().replace(' ', '-') %}
-                            <a href="{{ url_for('events.site_detail', site_slug=site_slug) }}">{{ event.site_name }}</a>
+                        {% if event.site.name %}
+                            {% set site_slug = event.site.name.lower().replace(' ', '-') %}
+                            <a href="{{ url_for('events.site_detail', site_slug=site_slug) }}">{{ event.site.name }}</a>
                         {% else %}
                             &mdash;
                         {% endif %}

@@ -17,13 +17,7 @@ def events():
     events = db.session.scalars(
         sa.select(Event).order_by(Event.date.desc()).limit(10)
     ).all()
-    event_dicts = []
-    for event in events:
-        site = db.session.get(Site, event.site_id)
-        event_dict = event.to_dict()
-        event_dict['site_name'] = site.name if site else ''
-        event_dicts.append(event_dict)
-    return render_template('events/events.html', title='Events', events=event_dicts)
+    return render_template('events/events.html', title='Events', events=events)
 
 @bp.route('/events/<event_slug>')
 def event_detail(event_slug):
@@ -33,15 +27,11 @@ def event_detail(event_slug):
     )
     if not event:
         return render_template('text_page.html', title='Event Not Found', text_content='<p>Event not found.</p>'), 404
-    site = db.session.get(Site, event.site_id)
-    event_dict = event.to_dict()
-    event_dict['site_name'] = site.name if site else ''
     is_future_event = False
     already_registered = False
-    if event_dict.get('date'):
+    if event.date:
         try:
-            event_date = datetime.date.fromisoformat(event_dict['date'])
-            is_future_event = event_date > datetime.date.today()
+            is_future_event = event.date > datetime.date.today()
         except Exception:
             pass
     # Check if user is logged in and already registered
@@ -65,7 +55,7 @@ def event_detail(event_slug):
             registration_id = reg.id
     return render_template('events/event.html', 
                            title=event.name, 
-                           event=event_dict, 
+                           event=event, 
                            is_future_event=is_future_event, 
                            already_registered=already_registered, 
                            registration_id=registration_id)
@@ -126,8 +116,7 @@ def event_register(event_slug):
 @bp.route('/sites')
 def sites():
     sites = db.session.scalars(sa.select(Site).order_by(Site.name)).all()
-    site_dicts = [site.to_dict() for site in sites]
-    return render_template('events/sites.html', title='Sites', sites=site_dicts)
+    return render_template('events/sites.html', title='Sites', sites=sites)
 
 # Dynamic site detail page with human-readable slug
 @bp.route('/sites/<site_slug>')
@@ -138,5 +127,4 @@ def site_detail(site_slug):
     )
     if not site:
         return render_template('text_page.html', title='Site Not Found', text_content='<p>Site not found.</p>'), 404
-    site_dict = site.to_dict()
-    return render_template('events/site.html', title=site.name, site=site_dict)
+    return render_template('events/site.html', title=site.name, site=site)
