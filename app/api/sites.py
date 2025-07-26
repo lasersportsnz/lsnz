@@ -5,15 +5,14 @@ from app import db
 from app.api import bp
 from app.models import Site
 
-@bp.route('/sites', methods=['GET'])
-def sites():
-    sites = db.session.scalars(sa.select(Site)).all()
-    sites = [site.to_dict() for site in sites]
-    return Response(json.dumps(sites), mimetype='application/json')
-
 @bp.route('/sites/<int:id>', methods=['GET'])
 def get_site(id):
-    site = db.session.get(Site, id)
-    if site is None:
-        return Response(json.dumps({'error': 'Site not found'}), status=404, mimetype='application/json')
-    return Response(json.dumps(site.to_dict()), mimetype='application/json')
+    return db.get_or_404(Site, id).to_dict()
+
+@bp.route('/sites', methods=['GET'])
+def get_sites():
+    page = request.args.get('page', 1, type=int)
+    per_page = min(request.args.get('per_page', 10, type=int), 100)
+    return Site.to_collection_dict(sa.select(Site), page, per_page,
+                                    'api.get_sites')
+

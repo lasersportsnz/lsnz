@@ -2,7 +2,7 @@ import click
 from flask import current_app
 from flask.cli import with_appcontext
 from app import db
-from app.models import Player, Grade, Site, Event
+from app.models import Player, Grade, Site, Event, Post
 from datetime import date, datetime
 import os
 import json
@@ -65,4 +65,16 @@ def prepopulate():
         user.from_dict(p, new_user=True)
         db.session.add(user)
     db.session.commit()
-    click.echo('Prepopulated players, grades, sites, and events added.')
+
+    # Prepopulate posts from JSON
+    posts_path = os.path.join(os.path.dirname(__file__), 'posts.json')
+    with open(posts_path, encoding='utf-8') as f:
+        posts = json.load(f)
+    for p in posts:
+         # Attach author_id by looking up the author alias
+        author = Player.query.filter_by(alias=p['author_alias']).first()
+        post = Post()
+        post.from_dict(p)
+        db.session.add(post)
+    db.session.commit()
+    click.echo('Prepopulated players, grades, sites, events, and posts.')

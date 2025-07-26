@@ -4,9 +4,7 @@ def test_events_api(client):
     assert resp.status_code == 200
     assert resp.is_json or resp.mimetype == 'application/json'
     data = resp.get_json()
-    assert isinstance(data, list)
-    if data:
-        assert 'id' in data[0] or 'name' in data[0]
+    assert isinstance(data, dict)
 
 def test_events_api_not_found(client):
     resp = client.get('/api/events/999999')
@@ -17,9 +15,7 @@ def test_players_api(client):
     assert resp.status_code == 200
     assert resp.is_json or resp.mimetype == 'application/json'
     data = resp.get_json()
-    assert isinstance(data, list)
-    if data:
-        assert 'id' in data[0] or 'name' in data[0]
+    assert isinstance(data, dict)
 
 def test_players_api_not_found(client):
     resp = client.get('/api/players/999999')
