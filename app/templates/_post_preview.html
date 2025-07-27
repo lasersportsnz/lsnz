@@ -1,0 +1,19 @@
+ <table class="table table-hover">
+        <tr>
+            <td width="70px">
+                <a href="{{ url_for('main.player', alias=post.author.alias) }}">
+                    <img src="{{ post.author.profile_picture }}" />
+                </a>
+            </td>
+            <td>
+                {% set post_slug = post.title.lower().replace(' ', '-') %}
+                <a href="{{ url_for('main.blog_post', post_slug=post_slug) }}">
+                    {{ post.title }}
+                </a>
+                <br><br>
+                <a href="{{ url_for('main.player', alias=post.author.alias) }}">
+                    {{ post.author.alias }}
+                </a>
+            </td>
+        </tr>
+    </table>

@@ -72,7 +72,6 @@ def prepopulate():
         posts = json.load(f)
     for p in posts:
          # Attach author_id by looking up the author alias
-        author = Player.query.filter_by(alias=p['author_alias']).first()
         post = Post()
         post.from_dict(p)
         db.session.add(post)

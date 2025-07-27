@@ -34,6 +34,31 @@ class PaginatedAPIMixin(object):
         }
         return data
 
+class Grade(db.Model):
+    __tablename__ = 'grades'
+    id: so.Mapped[int] = so.mapped_column(primary_key=True, autoincrement=True)
+    letter: so.Mapped[str] = so.mapped_column(sa.String(10), unique=True, index=True)
+    points: so.Mapped[int] = so.mapped_column(sa.Integer, unique=True)
+    description: so.Mapped[Optional[str]] = so.mapped_column(sa.String(200))
+    players: so.WriteOnlyMapped[List['Player']] = so.relationship(back_populates='grade')
+
+    def from_dict(self, data):
+        for field in ['letter', 'points', 'description']:
+            if field in data:
+                setattr(self, field, data[field])
+
+    def to_dict(self):
+        """Return object data in easily serialisable format"""
+        return {
+            'id': self.id,
+            'letter': self.letter,
+            'points': self.points,
+            'description': self.description
+        }
+    
+    def __repr__(self):
+        return f'<Grade {self.letter} worth {self.points} points>'
+
 class Player(PaginatedAPIMixin, UserMixin, db.Model):
     __tablename__ = 'players'
     id: so.Mapped[int] = so.mapped_column(primary_key=True, autoincrement=True)
@@ -41,7 +66,7 @@ class Player(PaginatedAPIMixin, UserMixin, db.Model):
     last_name: so.Mapped[str] = so.mapped_column(sa.String(64))
     email: so.Mapped[str] = so.mapped_column(sa.String(120), unique=True, index=True)
     alias: so.Mapped[Optional[str]] = so.mapped_column(sa.String(20))
-    grade_id: so.Mapped[Optional[int]] = so.mapped_column(sa.ForeignKey('grades.id'), index=True)
+    grade_id: so.Mapped[Optional[int]] = so.mapped_column(sa.ForeignKey(Grade.id), index=True)
     grade: so.Mapped[Optional['Grade']] = so.relationship(back_populates='players')
     profile_picture: so.Mapped[Optional[str]] = so.mapped_column(sa.String(200))
     playing_since: so.Mapped[Optional[sa.Date]] = so.mapped_column(sa.Date)
@@ -140,31 +165,6 @@ class Player(PaginatedAPIMixin, UserMixin, db.Model):
     @login.user_loader
     def load_user(id):
         return db.session.get(Player, int(id))
-    
-class Grade(db.Model):
-    __tablename__ = 'grades'
-    id: so.Mapped[int] = so.mapped_column(primary_key=True, autoincrement=True)
-    letter: so.Mapped[str] = so.mapped_column(sa.String(10), unique=True, index=True)
-    points: so.Mapped[int] = so.mapped_column(sa.Integer, unique=True)
-    description: so.Mapped[Optional[str]] = so.mapped_column(sa.String(200))
-    players: so.WriteOnlyMapped[List['Player']] = so.relationship(back_populates='grade')
-
-    def from_dict(self, data):
-        for field in ['letter', 'points', 'description']:
-            if field in data:
-                setattr(self, field, data[field])
-
-    def to_dict(self):
-        """Return object data in easily serialisable format"""
-        return {
-            'id': self.id,
-            'letter': self.letter,
-            'points': self.points,
-            'description': self.description
-        }
-    
-    def __repr__(self):
-        return f'<Grade {self.letter} worth {self.points} points>'
     
 class Site(db.Model):
     __tablename__ = 'sites'
@@ -283,9 +283,11 @@ class Post(PaginatedAPIMixin, db.Model):
     author: so.Mapped['Player'] = so.relationship(back_populates='posts')
 
     def from_dict(self, data):
-        for field in ['title', 'body', 'timestamp', 'author_id']:
+        for field in ['title', 'body', 'author_id']:
             if field in data:
                 setattr(self, field, data[field])
+        if 'timestamp' in data:
+            self.timestamp = datetime.fromisoformat(data['timestamp'])
 
     def to_dict(self):
         return {

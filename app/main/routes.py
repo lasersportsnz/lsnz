@@ -1,14 +1,15 @@
 import os
 import datetime
 import markdown
-from flask import render_template, redirect, url_for, request, current_app
+from flask import render_template, redirect, url_for, flash, request, current_app
 from flask_login import current_user, login_required
 from app.auth.identity import admin_permission
 import sqlalchemy as sa
 from sqlalchemy import func
 from app import db
-from app.models import Player, Grade, Event, Site
+from app.models import Player, Grade, Event, Site, Post
 from app.main import bp
+from app.main.forms import EditProfileForm, PostForm
 
 CONTENT_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'content')
 
@@ -72,18 +73,60 @@ def resources():
 
 @bp.route('/blog')
 def blog():
-    posts = [
-        {
-            'author': {'name': 'Louis'},
-            'body': 'Laser tag is fun!'
-        },
-        {
-            'author': {'name': 'Rachel'},
-            'body': 'Here\'s why you should play laser tag: it\'s a great way to exercise and have fun!'
-        }
-    ]
-    return render_template('blog.html', title='Blog', posts=posts)
+    query = sa.select(Post).order_by(Post.timestamp.desc())
+    page = request.args.get('page', 1, type=int)
+    posts = db.paginate(query, page=page,
+                        per_page=current_app.config['POSTS_PER_PAGE'],
+                        error_out=False)
+    next_url = url_for('main.blog', page=posts.next_num) \
+        if posts.has_next else None
+    prev_url = url_for('main.blog', page=posts.prev_num) \
+        if posts.has_prev else None
+    return render_template('blog.html', title='Blog', posts=posts.items,
+                        next_url=next_url, prev_url=prev_url)
 
+@bp.route('/blog/<post_slug>')
+def blog_post(post_slug):
+    post = db.first_or_404(
+        sa.select(Post)
+        .where(func.lower(func.replace(Post.title, ' ', '-')) == post_slug.lower())
+    )
+    markdown_content = markdown.markdown(post.body)
+
+    return render_template('post.html', title=post.title, post=post, content=markdown_content)
+
+@bp.route('/blog/<post_slug>/edit', methods=['GET', 'POST'])
+@login_required
+@admin_permission.require(http_exception=403)
+def edit_blog_post(post_slug):
+    post = db.first_or_404(
+        sa.select(Post)
+        .where(func.lower(func.replace(Post.title, ' ', '-')) == post_slug.lower())
+    )
+    form = PostForm()
+    if form.validate_on_submit():
+        post.title = form.title.data
+        post.body = form.body.data
+        db.session.commit()
+        flash('Your post has been updated.')
+        return redirect(url_for('main.blog_post', post_slug=post_slug))
+    elif request.method == 'GET':
+        form.title.data = post.title
+        form.body.data = post.body
+    return render_template('post_editor.html', title=post.title, form=form)
+
+@bp.route('/blog/post', methods=['GET', 'POST'])
+@login_required
+@admin_permission.require(http_exception=403)
+def write_post():
+    form = PostForm()
+    if form.validate_on_submit():
+        post = Post(title=form.title.data, body=form.body.data, author=current_user)
+        db.session.add(post)
+        db.session.commit()
+        flash('Your post is now live!')
+        return redirect(url_for('main.write_post'))
+    return render_template('post_editor.html', title='Editor', form=form)
 
 @bp.route('/about')
 def about():
@@ -115,4 +158,25 @@ def players():
 @bp.route('/players/<alias>')
 def player(alias):
     player = db.first_or_404(sa.select(Player).where(func.lower(Player.alias) == alias.lower()))
-    return render_template('player.html', player=player)
+    posts = db.session.scalars(player.posts.select()).all()
+    return render_template('player.html', player=player, posts=posts)
+
+@bp.route('/edit_profile', methods=['GET', 'POST'])
+@login_required
+def edit_profile():
+    form = EditProfileForm(current_user.alias)
+    if form.validate_on_submit():
+        current_user.first_name = form.first_name.data
+        current_user.last_name = form.last_name.data
+        current_user.alias = form.alias.data
+        current_user.bio = form.bio.data
+        db.session.commit()
+        flash('Your changes have been saved.')
+        return redirect(url_for('main.edit_profile'))
+    elif request.method == 'GET':
+        form.first_name.data = current_user.first_name
+        form.last_name.data = current_user.last_name
+        form.alias.data = current_user.alias
+        form.bio.data = current_user.bio
+    return render_template('edit_profile.html', title='Edit Profile',
+                           form=form)

@@ -16,5 +16,11 @@
             </tr>
         </table>
     </div>
+    {% if player == current_user %}
+    <p><a href="{{ url_for('main.edit_profile') }}">Edit your profile</a></p>
+    {% endif %}
+    {% for post in posts %}
+    {% include '_post_preview.html' %}
+    {% endfor %}
 </div>
 {% endblock %}
