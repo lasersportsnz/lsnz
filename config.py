@@ -10,3 +10,4 @@ class Config:
         'sqlite:///' + os.path.join(basedir, 'app.db')
     FLASK_DEBUG=0
     POSTS_PER_PAGE = 25
+    MAPS_API_KEY = os.environ.get('MAPS_API_KEY')
