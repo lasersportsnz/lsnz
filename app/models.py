@@ -275,7 +275,9 @@ class Post(PaginatedAPIMixin, db.Model):
     __tablename__ = 'posts'
     id: so.Mapped[int] = so.mapped_column(primary_key=True, autoincrement=True)
     title: so.Mapped[str] = so.mapped_column(sa.String(50))
+    summary: so.Mapped[str] = so.mapped_column(sa.String(200))
     body: so.Mapped[str] = so.mapped_column(sa.Text)
+    image: so.Mapped[str] = so.mapped_column(sa.String(200))
     timestamp: so.Mapped[datetime] = so.mapped_column(
         index=True, default=lambda: datetime.now(timezone.utc))
     author_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey(Player.id), index=True)

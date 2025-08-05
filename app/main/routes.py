@@ -10,6 +10,7 @@ from app import db
 from app.models import Player, Grade, Event, Site, Post
 from app.main import bp
 from app.main.forms import EditProfileForm, PostForm
+from werkzeug.utils import secure_filename
 
 CONTENT_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'content')
 
@@ -78,12 +79,22 @@ def blog():
     posts = db.paginate(query, page=page,
                         per_page=current_app.config['POSTS_PER_PAGE'],
                         error_out=False)
-    next_url = url_for('main.blog', page=posts.next_num) \
-        if posts.has_next else None
-    prev_url = url_for('main.blog', page=posts.prev_num) \
-        if posts.has_prev else None
+    next_url = url_for('main.blog', page=posts.next_num) if posts.has_next else None
+    prev_url = url_for('main.blog', page=posts.prev_num) if posts.has_prev else None
+
+    # Calculate total pages and page window
+    total_pages = posts.pages
+    window_size = 5
+    start_page = max(1, page - window_size // 2)
+    end_page = min(total_pages, start_page + window_size - 1)
+    if end_page - start_page < window_size - 1:
+        start_page = max(1, end_page - window_size + 1)
+    pages = list(range(start_page, end_page + 1))
+    show_last = total_pages > 1 and (not pages or pages[-1] < total_pages)
+
     return render_template('blog.html', title='Blog', posts=posts.items,
-                        next_url=next_url, prev_url=prev_url)
+                        page=page, next_url=next_url, prev_url=prev_url,
+                        pages=pages, total_pages=total_pages, show_last=show_last)
 
 @bp.route('/blog/<post_slug>')
 def blog_post(post_slug):
@@ -94,6 +105,12 @@ def blog_post(post_slug):
     markdown_content = markdown.markdown(post.body)
 
     return render_template('post.html', title=post.title, post=post, content=markdown_content)
+
+# Helper function to save uploaded image file
+def save_image_file(image_file):
+    filename = secure_filename(image_file.filename)
+    image_file.save(os.path.join(current_app.root_path, current_app.config['UPLOAD_PATH'], filename))
+    return filename
 
 @bp.route('/blog/<post_slug>/edit', methods=['GET', 'POST'])
 @login_required
@@ -107,13 +124,17 @@ def edit_blog_post(post_slug):
     if form.validate_on_submit():
         post.title = form.title.data
         post.body = form.body.data
+        image_file = form.image.data
+        post.image = save_image_file(image_file)
         db.session.commit()
         flash('Your post has been updated.')
         return redirect(url_for('main.blog_post', post_slug=post_slug))
     elif request.method == 'GET':
         form.title.data = post.title
+        form.summary.data = post.summary
         form.body.data = post.body
-    return render_template('post_editor.html', title=post.title, form=form)
+    # Pass current image filename for preview
+    return render_template('post_editor.html', title=post.title, form=form, is_edit=True, current_image=post.image)
 
 @bp.route('/blog/post', methods=['GET', 'POST'])
 @login_required
@@ -121,12 +142,21 @@ def edit_blog_post(post_slug):
 def write_post():
     form = PostForm()
     if form.validate_on_submit():
-        post = Post(title=form.title.data, body=form.body.data, author=current_user)
+        post = Post()
+        post.title = form.title.data
+        post.summary = form.summary.data
+        post.body = form.body.data
+        post.author = current_user
+
+        image_file = form.image.data
+        post.image = save_image_file(image_file)
+
         db.session.add(post)
         db.session.commit()
         flash('Your post is now live!')
-        return redirect(url_for('main.write_post'))
-    return render_template('post_editor.html', title='Editor', form=form)
+        post_slug = post.title.lower().replace(' ', '-')
+        return redirect(url_for('main.blog_post', post_slug=post_slug))
+    return render_template('post_editor.html', title='Editor', form=form, is_edit=False)
 
 @bp.route('/about')
 def about():

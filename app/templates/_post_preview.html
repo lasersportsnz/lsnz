@@ -1,19 +1,23 @@
- <table class="table table-hover">
-        <tr>
-            <td width="70px">
-                <a href="{{ url_for('main.player', alias=post.author.alias) }}">
-                    <img src="{{ post.author.profile_picture }}" />
-                </a>
-            </td>
-            <td>
-                {% set post_slug = post.title.lower().replace(' ', '-') %}
-                <a href="{{ url_for('main.blog_post', post_slug=post_slug) }}">
-                    {{ post.title }}
-                </a>
-                <br><br>
-                <a href="{{ url_for('main.player', alias=post.author.alias) }}">
-                    {{ post.author.alias }}
-                </a>
-            </td>
-        </tr>
-    </table>
+<div class="card h-100 shadow-sm bg-dark text-light">
+    {% if post.image %}
+    <img src="{{ config.UPLOAD_PATH ~ post.image }}" class="card-img-top" alt="Post image" style="object-fit:cover;max-height:180px;">
+    {% endif %}
+    <div class="card-body pb-2">
+        {% set post_slug = post.title.lower().replace(' ', '-') %}
+        <a href="{{ url_for('main.blog_post', post_slug=post_slug) }}" class="h5 text-info">{{ post.title }}</a>
+        {% if post.summary %}
+        <p class="mt-2 mb-2 text-light">{{ post.summary }}</p>
+        {% endif %}
+    </div>
+    <div class="card-footer bg-transparent border-0 pt-0">
+        <div class="d-flex align-items-center">
+            <a href="{{ url_for('main.player', alias=post.author.alias) }}">
+                <img src="{{ post.author.profile_picture }}" class="rounded me-2" style="width:36px;height:36px;object-fit:cover;" alt="{{ post.author.alias }} profile">
+            </a>
+            <div>
+                <a href="{{ url_for('main.player', alias=post.author.alias) }}" class="fw-bold text-light">{{ post.author.alias }}</a>
+                <div class="small" style="color:#72C2E8;">{{ post.timestamp.strftime('%b %d, %Y')}}</div>
+            </div>
+        </div>
+    </div>
+</div>

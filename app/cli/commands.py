@@ -1,9 +1,11 @@
 import click
-from flask import current_app
+import random
+from flask import current_app, url_for
 from flask.cli import with_appcontext
 from app import db
+import sqlalchemy as sa
 from app.models import Player, Grade, Site, Event, Post
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 import os
 import json
 
@@ -66,14 +68,29 @@ def prepopulate():
         db.session.add(user)
     db.session.commit()
 
-    # Prepopulate posts from JSON
-    posts_path = os.path.join(os.path.dirname(__file__), 'posts.json')
-    with open(posts_path, encoding='utf-8') as f:
-        posts = json.load(f)
-    for p in posts:
-         # Attach author_id by looking up the author alias
+    add_posts(10)
+    click.echo('Prepopulated players, grades, sites, events, and posts.')
+
+def add_posts(num: int = 10):
+    authors = db.session.scalars(sa.select(Player)).all()
+    now = datetime.now()
+    for i in range(num):
+        author = random.choice(authors)
+        # Random timestamp within the last year
+        days_ago = random.randint(0, 365)
+        post_time = now - timedelta(days=days_ago, hours=random.randint(0,23), minutes=random.randint(0,59))
         post = Post()
-        post.from_dict(p)
+        post.author = author
+        post.title = f"Junk Post {i+1}"
+        post.summary = "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+        post.body = post.summary
+        post.image = 'default.png'
+        post.timestamp = post_time
         db.session.add(post)
     db.session.commit()
-    click.echo('Prepopulated players, grades, sites, events, and posts.')
+    
+@bp.cli.command('posts')
+@click.option('--num', default=10)
+@with_appcontext
+def posts(num):
+    add_posts(num)
